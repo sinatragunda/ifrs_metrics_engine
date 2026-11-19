@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "ifrs_metrics_engine.apps.invitation.InvitationConfig",
     "ifrs_metrics_engine.apps.users.UsersConfig",
+    "ifrs_metrics_engine.apps.project.ProjectConfig",
     "ifrs_metrics_engine.apps.workspace.WorkspaceConfig",
     "boot_infrastructure.IfrsBootInfrastuctureApp",
 ]

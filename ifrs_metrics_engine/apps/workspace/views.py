@@ -6,7 +6,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
 from boot_infrastructure.container_bean import Container
 from boot_infrastructure.context.user_session_context import user_session_context_var
 from ifrs_metrics_engine.apps.workspace.models import Workspace, WorkspaceSerializer
-from ifrs_metrics_engine.apps.workspace.workspace_repository import WorkspaceRepository
+from ifrs_metrics_engine.apps.workspace.workspace_service import WorkspaceService
 from ifrs_metrics_engine.utils.context_util import get_session_user
 
 
@@ -14,7 +14,7 @@ from ifrs_metrics_engine.utils.context_util import get_session_user
 
 @api_view(['GET' ,'POST','DELETE'])
 @inject
-def workspaces_route(request ,workspace_repository : WorkspaceRepository=Provide[Container.workspace_repository]):
+def workspaces_route(request, workspace_repository : WorkspaceService=Provide[Container.workspace_repository]):
     request_method = request.method
     if request_method == 'GET':
         return get_user_workspaces(request ,workspace_repository)
@@ -22,14 +22,14 @@ def workspaces_route(request ,workspace_repository : WorkspaceRepository=Provide
         return create_user_workspaces(request,workspace_repository)
 
 
-def get_user_workspaces(request,workspace_repository : WorkspaceRepository):
+def get_user_workspaces(request, workspace_repository : WorkspaceService):
     print("get_user_workspaces ,check id from token directly")
     user_data  = get_user_data()
     workspaces = workspace_repository.get_workspace_by_user_id(user_data.auth_user_id)
     response = WorkspaceSerializer(workspaces, many=True)
     return JsonResponse(response.data ,safe=False)
 
-def create_user_workspaces(request ,workspace_repository : WorkspaceRepository):
+def create_user_workspaces(request, workspace_repository : WorkspaceService):
 
     user_data = get_session_user()
     user_model = user_data.user_model
