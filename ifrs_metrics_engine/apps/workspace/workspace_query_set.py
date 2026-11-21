@@ -15,16 +15,15 @@ class WorkspaceQuerySet(QuerySet):
 
     # Returns all workspaces a user can view and the corresponding projects too .
     def workspaces_and_projects(self ,user_id):
-        own_workspaces = Workspace.objects.filter(user_id=user_id)
-        invited_workspaces = WorkspaceMember.objects.filter(user_id=user_id)
 
-        for w in own_workspaces:
-            own_workspaces.projects = Project.objects.filter(workspace_id=w.workspace_id)
+        own_workspaces = Workspace.objects.filter(user_id=user_id).prefetch_related("projects")
+
+        invited_workspaces = WorkspaceMember.objects.filter(user_id=user_id)
 
         for w in invited_workspaces:
             workspace = w.workspace
-            access_scope = workspace.access_scope
-            w.projects = Project.objects.filter(workspace_id=w.workspace_id)
+            access_scope = w.access_scope
+            w.projects = Project.objects.filter(workspace_id=w.workspace.workspace_id)
 
 
         assigned_projects = ProjectMember.objects.filter(user_id=user_id)

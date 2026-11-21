@@ -12,16 +12,24 @@ from boot_infrastructure.container_bean import Container
 from ifrs_metrics_engine.apps.invitation.models import Invitation, InvitationProject
 from ifrs_metrics_engine.apps.project.models import Project
 from ifrs_metrics_engine.apps.project.project_service import ProjectService
+from ifrs_metrics_engine.utils.context_util import get_resources_folder
 from ifrs_metrics_engine.utils.email.email_service import EmailService, EmailDetails
 
 
 @dataclass
-class InvitationRequest:
+class InvitesRequest:
     email: str
     workspace_id: str
     user_id: str
-    email : str
-    projects : list[int]
+    roleId: str
+    projectIds : list[int]
+
+
+@dataclass
+class InvitationRequest:
+    user_id: str
+    invites : list[InvitesRequest]
+
 
 SUBJECT = 'Invitation Request'
 
@@ -33,41 +41,48 @@ class InvitationService:
 
     def send_invitation(self, invitation_request : InvitationRequest):
 
-        project_ids  = set(invitation_request.projects)
+        user_id= invitation_request.user_id
+        invites = invitation_request.invites
 
-        if not project_ids:
+        if not invites:
             raise Exception('Invitation request must have at least one project')
 
         token = self.__create_token_link(invitation_request)
 
-        projects = Project.objects.filter(id__in=project_ids)
+        for invite in invites:
 
-        with transaction.atomic():
+            with transaction.atomic():
 
-            invitation = {
-                'workspace_id' : invitation_request.workspace_id,
-                'email' : invitation_request.email,
-                'token' : self.__create_token_link(invitation_request),
-            }
+                invitation = {
+                    'workspace_id' : invite.workspace_id,
+                    'email' : invite.email,
+                    'token' : token,
+                }
 
-            invitation = Invitation(**invitation)
+                email_template_file = f'{get_resources_folder()}/mail/invitation.html'
 
-            invitation.save()
+                invitation = Invitation(**invitation)
 
-            invitation_projects  = list(map(lambda project: InvitationProject(invitation ,project),projects))
+                invitation.save()
 
-            list(map(lambda invitation_project: invitation_project.save() ,invitation_projects))
+                projects = set(invite.projectIds)
 
-            InvitationProject.objects.bulk_create([InvitationProject(invitation = invitation ,project = project) for project in invitation_projects])
+                if projects:
+                    projects = Project.objects.filter(id_in = set(invite.projectIds))
+                    invitation_projects  = list(map(lambda project: InvitationProject(invitation ,project),projects))
+                    list(map(lambda invitation_project: invitation_project.save() ,invitation_projects))
+                    InvitationProject.objects.bulk_create([InvitationProject(invitation = invitation ,project = project) for project in invitation_projects])
 
-            email_details = EmailDetails(
-                email=invitation.email,
-                template='/resources/mail/invitation.html',
-                subject=SUBJECT)
 
-            self.email_service.send_email(email_details)
 
-            transaction.on_commit(lambda: self.email_service.send_email(email_details))
+                email_details = EmailDetails(
+                    email=invitation.email,
+                    template=email_template_file,
+                    subject=SUBJECT)
+
+                self.email_service.send_email(email_details)
+
+                transaction.on_commit(lambda: self.email_service.send_email(email_details))
 
     def approve_invitation(self, invitation):
         pass

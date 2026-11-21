@@ -38,8 +38,8 @@ class ClerkAuthenticationMiddleware:
 
             print(f" we have beaerer token with secret key {CLERK_SECRET_KEY}")
 
-            auth_token = bearer_token.replace('Bearer ', '')
             clerk = Clerk(bearer_auth = CLERK_SECRET_KEY)
+
             if clerk:
                 print("we have clerk token")
                 request_state = clerk.authenticate_request(request ,AuthenticateRequestOptions())

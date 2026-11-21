@@ -8,7 +8,6 @@ from typing import Optional
 
 from ifrs_metrics_engine.apps.users.models import Users
 
-
 @dataclass
 class UserSession:
     auth_user_id : str

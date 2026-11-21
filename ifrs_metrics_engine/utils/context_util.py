@@ -3,6 +3,7 @@
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
 import os
 
+from pathlib import Path
 from boot_infrastructure.context.user_session_context import user_session_context_var
 from boot_infrastructure.middleware.clerk_authentication_middleware import CLERK_SECRET_KEY
 
@@ -16,3 +17,10 @@ def get_session_user():
     if not user_data:
         raise Exception("No user data found")
     return user_data
+
+
+def get_resources_folder():
+
+    base_dir = Path(__file__).resolve().parent
+    print(base_dir)
+    return f'{base_dir}/resources'
