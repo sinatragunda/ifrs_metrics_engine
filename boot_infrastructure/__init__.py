@@ -2,10 +2,11 @@
 # Created at 17/11/2026 07:54
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
 
-from .apps import IfrsBootInfrastuctureApp
-from . import constants
 
-__all__  =["middleware", "wire_container" ,"IfrsBootInfrastuctureApp" ,"constants"]
+
+from .apps import IfrsBootInfrastuctureApp
+
+__all__  =["middleware", "wire_container" ,"IfrsBootInfrastuctureApp"]
 
 def __getattr__(name):
 

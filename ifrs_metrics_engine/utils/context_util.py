@@ -5,12 +5,9 @@ import os
 
 from pathlib import Path
 from boot_infrastructure.context.user_session_context import user_session_context_var
-from boot_infrastructure.middleware.clerk_authentication_middleware import CLERK_SECRET_KEY
-
-CLERK_SECRET_KEY = os.environ.get("CLERK_SECRET_KEY")
 
 def get_clerk_secret_key():
-    return CLERK_SECRET_KEY
+    return os.environ.get("CLERK_SECRET_KEY")
 
 def get_session_user():
     user_data = user_session_context_var.get()
@@ -20,7 +17,7 @@ def get_session_user():
 
 
 def get_resources_folder():
-
+    print(__file__)
     base_dir = Path(__file__).resolve().parent
     print(base_dir)
-    return f'{base_dir}/resources'
+    return f'{base_dir}\\resources'

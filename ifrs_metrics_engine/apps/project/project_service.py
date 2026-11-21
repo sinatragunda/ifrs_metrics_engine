@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from dependency_injector.wiring import inject, Provide
 from django.db import transaction
 
-from boot_infrastructure.container_bean import Container
 from ifrs_metrics_engine.apps.project.models import Project
 from ifrs_metrics_engine.apps.workspace.workspace_service import WorkspaceService
 from ifrs_metrics_engine.utils.annotations import atomic_op
@@ -19,11 +18,10 @@ class ProjectRequest:
     name : str
     ifrs_standard : IFRS_STANDARD
 
-
 class ProjectService:
 
     @inject
-    def __init__(self ,workspace_service : WorkspaceService  = Provide[Container.workspace_service]):
+    def __init__(self ,workspace_service : WorkspaceService  = Provide["workspace_repository"]):
         self.workspace_service = workspace_service
 
     @atomic_op

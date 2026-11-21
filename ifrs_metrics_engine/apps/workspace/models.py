@@ -11,6 +11,7 @@ class Workspace(BaseEntity):
     name = models.CharField()
     workspace_id = models.CharField()
     user_id = models.CharField() # this is an external user id from our external auth system .
+
     objects = WorkspaceQuerySet.as_manager()
     db_table = 'workspace'
 
@@ -26,7 +27,7 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
 
 class WorkspaceMember(BaseEntity):
-    user = models.ForeignKey("users.Users", on_delete=models.CASCADE, related_name="workspace_memberships")
+    user = models.ForeignKey("users.Users", on_delete=models.CASCADE, related_name="workspace_memberships" ,null=True)
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="members")
     access_scope = models.CharField(max_length=32, choices=ACCESS_SCOPES.choices)
 

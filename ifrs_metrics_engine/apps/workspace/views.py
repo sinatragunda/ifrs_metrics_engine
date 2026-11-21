@@ -29,7 +29,7 @@ def get_user_workspaces(request, workspace_repository : WorkspaceService):
     response = WorkspaceSerializer(workspaces, many=True)
     return JsonResponse(response.data ,safe=False)
 
-def create_user_workspaces(request, workspace_repository : WorkspaceService):
+def create_user_workspaces(request, workspace_service : WorkspaceService):
 
     user_data = get_session_user()
     user_model = user_data.user_model
@@ -40,7 +40,7 @@ def create_user_workspaces(request, workspace_repository : WorkspaceService):
 
     kwargs = {
         'name': payload['name'],
-        'workspace_id': payload['id'],
+        'workspace_id': payload['workspaceId'],
         'user_id' : user_data.auth_user_id,
         'created_by' : user_model
     }
@@ -49,7 +49,7 @@ def create_user_workspaces(request, workspace_repository : WorkspaceService):
 
     print(f"create_user_workspaces ,check id from token directly {workspace}")
 
-    workspace = workspace_repository.save(workspace)
+    workspace = workspace_service.create(workspace)
     response = WorkspaceSerializer(workspace, many=True)
 
     return JsonResponse(response.data,safe=False,status=HTTP_201_CREATED)

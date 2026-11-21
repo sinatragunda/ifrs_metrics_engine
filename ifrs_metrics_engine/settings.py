@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "ifrs_metrics_engine.apps.invitation.InvitationConfig",
-    "ifrs_metrics_engine.apps.users.UsersConfig",
+    "ifrs_metrics_engine.apps.users.apps.UsersConfig",
     "ifrs_metrics_engine.apps.project.ProjectConfig",
     "ifrs_metrics_engine.apps.workspace.WorkspaceConfig",
     "boot_infrastructure.IfrsBootInfrastuctureApp",
@@ -65,6 +65,20 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "boot_infrastructure.middleware.ClerkAuthenticationMiddleware",
 ]
+#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "boot_infrastructure.mail_certi.CertifiEmailBackend"
+EMAIL_HOST = 'mail.privateemail.com'
+EMAIL_HOST_USER = 'info@ifrsmetrics.com'
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_API_KEY']
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    EMAIL_HOST_USER
+)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
 
 ROOT_URLCONF = "ifrs_metrics_engine.urls"
 
@@ -81,7 +95,7 @@ AUTH_EXEMPT_URIS = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [ BASE_DIR /'resources'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

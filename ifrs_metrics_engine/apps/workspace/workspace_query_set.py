@@ -1,10 +1,9 @@
 # Created by Sinatra Gunda 
 # Created at 17/11/2026 10:53
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
+from django.apps import apps
 from django.db.models import QuerySet
 
-from ifrs_metrics_engine.apps.project.models import Project, ProjectMember
-from ifrs_metrics_engine.apps.workspace.models import Workspace, WorkspaceMember
 from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES
 
 
@@ -16,7 +15,11 @@ class WorkspaceQuerySet(QuerySet):
     # Returns all workspaces a user can view and the corresponding projects too .
     def workspaces_and_projects(self ,user_id):
 
-        own_workspaces = Workspace.objects.filter(user_id=user_id).prefetch_related("projects")
+        own_workspaces = self.filter(user_id=user_id).prefetch_related("projects")
+
+        Project = apps.get_model("ifrs_metrics_engine", "Project")
+        WorkspaceMember = apps.get_model("ifrs_metrics_engine", "WorkspaceMember")
+        ProjectMember = apps.get_model("ifrs_metrics_engine", "ProjectMember")
 
         invited_workspaces = WorkspaceMember.objects.filter(user_id=user_id)
 

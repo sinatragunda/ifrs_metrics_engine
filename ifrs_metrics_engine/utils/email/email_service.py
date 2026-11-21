@@ -11,22 +11,22 @@ MAIL_SENDER = os.environ.get('MAIL_SENDER')
 
 @dataclass
 class EmailDetails:
-    email: str
     subject: str
     body: str
+    to: list[str] = field(default_factory=list)
     attachments: list = field(default_factory=list)
     cc: list[str] = field(default_factory=list)
     bcc: list[str] = field(default_factory=list)
     template: str | None = None
-    kwargs: dict = field(default_factory=dict)
+    context: dict = field(default_factory=dict)
 
 class EmailService:
 
     def send_email(self, email_details: EmailDetails):
 
         if email_details.template:
-            html_content = render_to_string(email_details.template, email_details.kwargs)
-            msg = EmailMultiAlternatives(to=email_details.email,subject= email_details.subject,from_email=MAIL_SENDER ,bcc=email_details.bcc ,cc=email_details.bcc)
+            html_content = render_to_string(email_details.template, email_details.context)
+            msg = EmailMultiAlternatives(to=email_details.to,subject= email_details.subject,from_email=MAIL_SENDER ,bcc=email_details.bcc ,cc=email_details.bcc)
             msg.attach_alternative(html_content, "text/html")
             msg.send()
         else:

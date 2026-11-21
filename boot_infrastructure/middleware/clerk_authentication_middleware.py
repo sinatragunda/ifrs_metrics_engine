@@ -11,7 +11,6 @@ from dependency_injector.wiring import Provide, inject
 from rest_framework.exceptions import NotAuthenticated
 from django.conf import settings
 
-from boot_infrastructure.container_bean import Container
 from boot_infrastructure.context.user_session_context import user_session_context_var, UserSession
 from ifrs_metrics_engine.apps.users.user_service import UserService
 
@@ -21,7 +20,7 @@ EXEMPT_URLS = getattr(settings, 'AUTH_EXEMPT_URIS', [])
 class ClerkAuthenticationMiddleware:
 
     @inject
-    def __init__(self ,get_response ,user_service : UserService = Provide[Container.user_service]):
+    def __init__(self ,get_response ,user_service : UserService = Provide['user_service']):
         self.get_response = get_response
         self.user_service = user_service
 
@@ -36,32 +35,23 @@ class ClerkAuthenticationMiddleware:
 
         if bearer_token:
 
-            print(f" we have beaerer token with secret key {CLERK_SECRET_KEY}")
-
             clerk = Clerk(bearer_auth = CLERK_SECRET_KEY)
 
             if clerk:
-                print("we have clerk token")
                 request_state = clerk.authenticate_request(request ,AuthenticateRequestOptions())
 
                 #print(f" we have request {request_state}")
-
                 #print(f"token state {request_state.is_authenticated} and {request_state.is_signed_in}")
-
                 if request_state.is_authenticated:
-                    print(request_state)
+                    #print(request_state)
+
                     user_id = request_state.payload['sub']
 
                     with Clerk(bearer_auth = CLERK_SECRET_KEY) as client_clerk:
+
                         user_data = client_clerk.users.get(user_id = user_id)
-
-                        print(f" user id {user_id}")
-
                         request.client_data = user_data
-
-                        print(type(user_service))
-
-                        user_entity = None #user_service.find_user_by_auth_id(user_id ,create_when_not_found=True)
+                        user_entity = user_service.find_user_by_auth_id(user_id)
 
                         user_session = {
                             'auth_user_id':user_data.id,
@@ -71,6 +61,8 @@ class ClerkAuthenticationMiddleware:
                             'email': user_data.email_addresses[0].email_address,
                             'user_model': user_entity,
                         }
+
+                        print("does authentication happen here often ? ",user_entity)
 
                         user_session = UserSession(**user_session)
                         user_session_context_var.set(user_session)
@@ -88,11 +80,7 @@ class ClerkAuthenticationMiddleware:
 
         path = request.path_info.lstrip("/")
 
-        print(f"path to check for exempt is {path}")
-
         if any(re.match(pattern, path) for pattern in EXEMPT_URLS):
-            print("exempt url")
             return True
 
-        print(f"not exempt url {path}")
         return False

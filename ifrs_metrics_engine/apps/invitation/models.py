@@ -1,10 +1,12 @@
 from django.db import models
+from docutils.parsers.rst.states import TYPE_CHECKING
 from rest_framework import serializers
+
 
 from ifrs_metrics_engine.apps.project.models import Project
 from ifrs_metrics_engine.apps.workspace.models import Workspace
 from ifrs_metrics_engine.utils import BaseEntity
-from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES ,INVITATION_STATUS
+from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES, INVITATION_STATUS
 
 
 # Create your models here.
@@ -12,7 +14,7 @@ from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES ,INVITATION_STATUS
 class Invitation(BaseEntity):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="invitations")
     email = models.EmailField()
-    token_hash = models.CharField(max_length=128, unique=True)
+    token = models.CharField(max_length=128, unique=True)
     access_scope = models.CharField(max_length=32, choices=ACCESS_SCOPES.choices)
     status = models.CharField(max_length=32, choices=INVITATION_STATUS.choices, default=INVITATION_STATUS.PENDING)
     expires_at = models.DateTimeField()

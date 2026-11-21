@@ -1,12 +1,15 @@
 
-from .apps import UsersConfig
 
-__all__ = ['UsersConfig',"Users"]
+import importlib
 
-def __getattr__(name):
-
-    if name == "Users":
-        from . import Users
-        return Users
-
-    raise AttributeError(name)
+# def __getattr__(name):
+#
+#     if name == "Users":
+#         models = importlib.import_module(".models" ,__name__)
+#         return models.Users
+#
+#     if name == "UsersConfig":
+#         from .apps import UsersConfig
+#         return UsersConfig
+#
+#     raise AttributeError(name)
