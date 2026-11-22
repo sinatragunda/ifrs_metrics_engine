@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from docutils.parsers.rst.states import TYPE_CHECKING
 from rest_framework import serializers
@@ -14,6 +16,7 @@ from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES, INVITATION_STATUS
 class Invitation(BaseEntity):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="invitations")
     email = models.EmailField()
+    invitation_id = models.CharField(max_length=54, editable=False ,unique=True)
     token = models.CharField(max_length=128, unique=True)
     access_scope = models.CharField(max_length=32, choices=ACCESS_SCOPES.choices)
     status = models.CharField(max_length=32, choices=INVITATION_STATUS.choices, default=INVITATION_STATUS.PENDING)
@@ -47,4 +50,4 @@ class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
 
-        fields = ['all']
+        fields = '__all__'

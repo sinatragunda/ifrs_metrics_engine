@@ -32,10 +32,15 @@ class UsersConfig(AppConfig):
                         print("Create user with details " ,clerk_user)
                         from ifrs_metrics_engine.apps.users.models import Users
                         display_name = f'{clerk_user.first_name} {clerk_user.last_name}'
-                        email = f'{clerk_user.primary_email_address_id}'
-                        user = Users(auth_user_id=clerk_user.id ,display_name=display_name ,username=clerk_user.username)
+                        email = self.__clerk_email_address(clerk_user)
+                        user = Users(auth_user_id=clerk_user.id ,display_name=display_name ,username=clerk_user.username ,email=email)
                         user_service.create_user(user)
 
+    def __clerk_email_address(self ,clerk_user):
+        print(type(clerk_user))
+        if clerk_user.email_addresses:
+            email_details = clerk_user.email_addresses[0]
+            return email_details.email_address
 
 
 

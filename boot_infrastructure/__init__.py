@@ -8,6 +8,9 @@ from .apps import IfrsBootInfrastuctureApp
 
 __all__  =["middleware", "wire_container" ,"IfrsBootInfrastuctureApp"]
 
+
+
+
 def __getattr__(name):
 
     if name == "middleware":

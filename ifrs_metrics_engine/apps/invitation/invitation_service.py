@@ -2,13 +2,17 @@
 # Created at 19/11/2026 10:42
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
 import datetime
+import hmac
 import os
+import time
 from dataclasses import dataclass
 
 from dependency_injector.wiring import Provide, inject
 from django.core import signing
 from django.db import transaction
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
+from boot_infrastructure.exceptions.custom_exceptions import BadRequestException
 from ifrs_metrics_engine.apps.invitation.models import Invitation, InvitationProject
 from ifrs_metrics_engine.apps.project.models import Project
 from ifrs_metrics_engine.apps.project.project_service import ProjectService
@@ -65,14 +69,16 @@ class InvitationService:
 
 
                 print('loggeed user model', user_session.user_model)
+                expires_at  = self.__token_expiration_time()
 
                 invitation = {
                     'workspace' : workspace,
                     'email' : invite.email,
                     'token' : token,
+                    'invitation_id' : invite.inviteId,
                     'status' : INVITATION_STATUS.PENDING,
                     'invited_by': user_session.user_model,
-                    'expires_at': self.__token_expiration_time()
+                    'expires_at': expires_at
                 }
 
                 email_template_file = 'mail/invitation.html'
@@ -87,6 +93,7 @@ class InvitationService:
                     'token': token,
                     'invited_by': user_session.username,
                     'workspace_name' : workspace.name,
+                    'expires_at': expires_at,
                 }
 
                 print("invite response is ",invite)
@@ -99,7 +106,7 @@ class InvitationService:
                     mail_content['confirm_url'] = self.__create_token_link(token ,invite.inviteId)
                 else:
                     workspace = Workspace.objects.get(workspace_id = invite.workspaceId)
-                    workspace_member = WorkspaceMember(workspace = workspace,access_scope =  invite.roleId)
+                    workspace_member = WorkspaceMember(workspace = workspace,access_scope = invite.roleId)
                     workspace_member.save()
                     mail_content['confirm_url'] = self.__create_token_link(token ,invite.inviteId)
 
@@ -112,12 +119,35 @@ class InvitationService:
 
                 print("mail details", email_details)
 
-                self.email_service.send_email(email_details)
-
                 transaction.on_commit(lambda: self.email_service.send_email(email_details))
 
-    def approve_invitation(self, invitation):
-        pass
+            return invitation
+
+    def approve_invitation(self, token ,invite_id):
+
+        print("approve invitation")
+
+        invitation  = Invitation.objects.filter(invitation_id = invite_id).first()
+
+        if (
+            not invitation
+            or not hmac.compare_digest(str(invitation.token), str(token))
+            or invitation.status != INVITATION_STATUS.PENDING
+            or invitation.expires_at < datetime.datetime.now()
+        ):
+            raise BadRequestException('Failed to authenticate or validate invitation.')
+
+
+        invitation.status = INVITATION_STATUS.ACCEPTED
+        invitation.accepted_at = datetime.datetime.now()
+
+        # create user record now if it doesnt exists yet
+
+        # WorkspaceMember.objects.filter()
+
+        # proceed in creating membership to project
+        return invitation
+
 
     def decline_invitation(self, invitation):
         pass

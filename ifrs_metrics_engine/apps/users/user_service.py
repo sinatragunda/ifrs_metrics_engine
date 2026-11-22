@@ -27,7 +27,7 @@ class UserService:
             if create_when_not_found:
                 user_session = get_session_user()
                 user_model = Users(auth_user_id=auth_id,username = user_session.username, display_name=f'{user_session.firstname} {user_session.lastname}',email=user_session.email)
-                return user_model.save()
+                return self.create_user(user_model)
             raise NotFound("User Not Found")
 
         return user

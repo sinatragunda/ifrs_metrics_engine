@@ -16,6 +16,7 @@ def get_session_user():
     return user_data
 
 
+
 def get_resources_folder():
     print(__file__)
     base_dir = Path(__file__).resolve().parent

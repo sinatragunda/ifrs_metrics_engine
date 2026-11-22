@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+
 from dotenv import load_dotenv
 import os
 
@@ -89,8 +90,11 @@ AUTH_EXEMPT_URIS = [
     r"^auth/login/?$",    # /users/login
     r"^payments/success/?$",    # /users/login
     r"^payments/error/?$",    # /users/login
-    r"^plugins/?$",        # /plugins
+    r"^confirm_invitation/?$",        # /plugins
 ]
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'boot_infrastructure.exceptions.exceptions_handler.custom_exception_handler',
+}
 
 TEMPLATES = [
     {
