@@ -17,13 +17,13 @@ class Workspace(BaseEntity):
 
 
 class WorkspaceSerializer(serializers.ModelSerializer):
-    access_scopes = serializers.ChoiceField(choices=ACCESS_SCOPES.choices, default=ACCESS_SCOPES.ALL)
+    access_scopes = serializers.ChoiceField(choices=ACCESS_SCOPES.choices, default=ACCESS_SCOPES.ADMIN)
     class Meta:
         model = Workspace
         fields = '__all__'
 
     def get_access_scopes(self):
-        return ACCESS_SCOPES.ALL
+        return ACCESS_SCOPES.ADMIN
 
 
 class WorkspaceMember(BaseEntity):
@@ -39,6 +39,13 @@ class WorkspaceMember(BaseEntity):
 
     def __str__(self):
         return f"{self.user_id} @ workspace {self.workspace_id}"
+
+
+class WorkspaceMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkspaceMember
+        fields = '__all__'
+
 
 
 

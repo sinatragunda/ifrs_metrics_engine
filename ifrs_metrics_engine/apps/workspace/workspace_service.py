@@ -16,6 +16,7 @@ class WorkspaceService:
             raise HTTP_400_BAD_REQUEST
         return workspace.save()
 
+
     def get_all_workspaces(self):
         return Workspace.objects.all()
 

@@ -17,7 +17,7 @@ class Invitation(BaseEntity):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name="invitations")
     email = models.EmailField()
     invitation_id = models.CharField(max_length=54, editable=False ,unique=True)
-    token = models.CharField(max_length=128, unique=True)
+    token = models.CharField(max_length=384, unique=True)
     access_scope = models.CharField(max_length=32, choices=ACCESS_SCOPES.choices)
     status = models.CharField(max_length=32, choices=INVITATION_STATUS.choices, default=INVITATION_STATUS.PENDING)
     expires_at = models.DateTimeField()

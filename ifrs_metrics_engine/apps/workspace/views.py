@@ -21,6 +21,13 @@ def workspaces_route(request, workspace_repository : WorkspaceService=Provide[Co
     elif request_method == 'POST':
         return create_user_workspaces(request,workspace_repository)
 
+@api_view(['GET'])
+def get_workspace_members(request ,workspace_id):
+    response = Workspace.objects.workspace_members(workspace_id)
+    print(response)
+    serializer = WorkspaceSerializer(response, many=True)
+    return JsonResponse(serializer.data ,safe=False)
+
 
 def get_user_workspaces(request, workspace_repository : WorkspaceService):
     print("get_user_workspaces ,check id from token directly")

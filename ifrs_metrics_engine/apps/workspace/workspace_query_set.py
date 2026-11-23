@@ -12,6 +12,9 @@ class WorkspaceQuerySet(QuerySet):
     def linked_users(self):
         pass
 
+    def workspace_members(self,workspace_id):
+        return self.filter(workspace_id = workspace_id).prefetch_related('members')
+
     # Returns all workspaces a user can view and the corresponding projects too .
     def workspaces_and_projects(self ,user_id):
 

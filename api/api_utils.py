@@ -7,5 +7,5 @@ from rest_framework.serializers import ModelSerializer
 
 def json_response(model : ModelSerializer ,status):
     if model:
-        return JsonResponse(model.data,safe=False ,status=status)
+        return JsonResponse(data=model.data,safe=False ,status=status)
     return JsonResponse(safe=False ,status=status)

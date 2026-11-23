@@ -7,9 +7,9 @@ from django.db import models
 
 
 class ACCESS_SCOPES(models.TextChoices):
-    ALL = 'all'
-    READ = 'read'
-    WRITE = 'write'
+    ADMIN = 'admin'
+    VIEWER = 'viewer'
+    EDITOR = 'editor'
     READ_WRITE = 'read_write'
 
 

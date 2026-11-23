@@ -4,6 +4,9 @@
 import os
 
 from pathlib import Path
+
+from rest_framework.exceptions import NotAuthenticated
+
 from boot_infrastructure.context.user_session_context import user_session_context_var
 
 def get_clerk_secret_key():
@@ -13,8 +16,10 @@ def get_session_user():
     user_data = user_session_context_var.get()
     if not user_data:
         raise Exception("No user data found")
-    return user_data
+    if not user_data.user_model:
+        raise NotAuthenticated()
 
+    return user_data
 
 
 def get_resources_folder():
