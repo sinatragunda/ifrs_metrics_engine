@@ -64,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "boot_infrastructure.middleware.ExceptionsMiddleware",
     "boot_infrastructure.middleware.ClerkAuthenticationMiddleware",
 ]
 #EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -89,7 +90,7 @@ AUTH_EXEMPT_URIS = [
     r"^$",                 # /
     r"^auth/login/?$",    # /users/login
     r"^payments/success/?$",    # /users/login
-    r"^payments/error/?$",    # /users/login
+    r"^webhooks/?$",    # /users/login
     r"^confirm_invitation/?$",        # /plugins
 ]
 REST_FRAMEWORK = {

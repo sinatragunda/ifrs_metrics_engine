@@ -3,5 +3,7 @@
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
 
 from .clerk_authentication_middleware import ClerkAuthenticationMiddleware
+from .exceptions_middleware import ExceptionsMiddleware
 
-__all__ = ["ClerkAuthenticationMiddleware"]
+__all__ = ["ClerkAuthenticationMiddleware" ,"ExceptionsMiddleware"]
+

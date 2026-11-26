@@ -14,6 +14,23 @@ class InternalServerError(APIException):
     default_detail = 'Internal Server Error'
     default_code = 'internal_server_error'
 
+
+class NotAuthenticated(APIException):
+    status_code = 401
+    default_detail = 'Not Authenticated'
+    default_code = 'not_authenticated'
+
+class NotAuthenticatedWithLoginRequirement(APIException):
+    status_code = 401
+    default_detail = 'Not Authenticated'
+    default_code = 'not_authenticated'
+    require_login = True
+
+class ConflictError(APIException):
+    status_code = 409
+    default_detail = 'Conflict'
+    default_code = 'conflict'
+
 class NotFoundException(APIException):
     status_code = 404
     default_detail = 'Not Found'

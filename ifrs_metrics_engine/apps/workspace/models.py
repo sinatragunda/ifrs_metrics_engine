@@ -1,3 +1,5 @@
+import email
+
 from django.db.models import Choices
 from rest_framework import serializers
 from django.db import models
@@ -5,11 +7,12 @@ from django.db import models
 from ifrs_metrics_engine.apps.workspace.workspace_query_set import WorkspaceQuerySet
 from ifrs_metrics_engine.utils import BaseEntity
 from ifrs_metrics_engine.utils.choices import ACCESS_SCOPES, IFRS_STANDARD, INVITATION_STATUS
+from ifrs_metrics_engine.utils.context_util import generate_model_id
 
 
 class Workspace(BaseEntity):
-    name = models.CharField()
-    workspace_id = models.CharField()
+    name = models.CharField(null=False)
+    workspace_id = models.CharField(null=False ,default=generate_model_id('workspace') ,unique=True)
     user_id = models.CharField() # this is an external user id from our external auth system .
 
     objects = WorkspaceQuerySet.as_manager()
@@ -42,6 +45,12 @@ class WorkspaceMember(BaseEntity):
 
 
 class WorkspaceMemberSerializer(serializers.ModelSerializer):
+
+    email = serializers.SerializerMethodField()
+
+    def get_email(self ,obj):
+        return self.context.get("email")
+
     class Meta:
         model = WorkspaceMember
         fields = '__all__'

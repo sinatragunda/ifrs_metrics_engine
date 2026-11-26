@@ -2,11 +2,8 @@ import os
 from typing import TYPE_CHECKING
 
 from clerk_backend_api import Clerk
-from dependency_injector.wiring import Provide, inject
 from django.apps import AppConfig
 from rest_framework.exceptions import NotFound
-
-
 
 
 class UsersConfig(AppConfig):

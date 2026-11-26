@@ -32,14 +32,10 @@ def confirm_invitation(request ,invitation_service : InvitationService = Provide
 
     token = request.data.get('token')
 
-    print(request.data)
+    workspace_member_serializer = invitation_service.approve_invitation(token)
 
-    workspace_member = invitation_service.approve_invitation(token)
+    return json_response(workspace_member_serializer, status=status.HTTP_201_CREATED)
 
-    print("workspace_member",workspace_member)
-    serializer = WorkspaceMemberSerializer(workspace_member)
-
-    return json_response(serializer, status=status.HTTP_201_CREATED)
 
 
 def get_invitations(invitation_service : InvitationService):

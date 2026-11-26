@@ -7,6 +7,5 @@ class IfrsBootInfrastuctureApp(AppConfig):
     name = "boot_infrastructure"
 
     def ready(self):
-        print("App ready wire container ")
         from boot_infrastructure import wire_container
         wire_container()

@@ -150,22 +150,17 @@ class InvitationService:
 
         invitation_id = decoded_token['invite_id']
 
-        print(invitation_id)
-
         invitation  = Invitation.objects.get(invitation_id = invitation_id)
-
-        print("approve with invitation ",invitation.__str__() ,invitation.token ,invitation.status)
-        digest_cmp = hmac.compare_digest(str(invitation.token), str(token))
 
         if (
             not invitation
-            or not digest_cmp
+            or not hmac.compare_digest(str(invitation.token), str(token))
             #or invitation.status != INVITATION_STATUS.PENDING
         ):
             raise BadRequestException('Failed to validate invitation.Token or invitation details invalid')
 
 
-        invitation.status = INVITATION_STATUS.ACCEPTED
+        #invitation.status = INVITATION_STATUS.ACCEPTED
         invitation.accepted_at = datetime.datetime.now()
 
         invitation.save()
@@ -177,19 +172,17 @@ class InvitationService:
             #'user' : user.id,
             'workspace' : workspace.id,
             'access_scope':invitation.access_scope,
-        })
+        },context={'email': invitation.email})
 
-
+        print('worspace serializer ' ,workspace_member_serializer.context)
 
         workspace_member_serializer.is_valid(raise_exception=True)
 
-        workspace_member = workspace_member_serializer.save()
-
-        print("workspace member created")
+        workspace_member_serializer.save()
 
         # create user record now if it doesn't exists yet
         # proceed in creating membership to project
-        return workspace_member
+        return workspace_member_serializer
 
 
     def decline_invitation(self, invitation):

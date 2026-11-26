@@ -2,18 +2,23 @@
 # Created at 18/11/2026 09:12
 # Kindly contact me at @sinatragunda or treyviis@gmail.com
 import os
+from typing import Any
 
 from clerk_backend_api import Clerk, models
+from dependency_injector.wiring import Provide
 from django.apps import apps
 from rest_framework.exceptions import NotFound
 from starlette.status import HTTP_400_BAD_REQUEST
 
+from api.webhooks.post_events_service import WebhooksPostEventsService
 from boot_infrastructure.exceptions.custom_exceptions import InternalServerError
-from ifrs_metrics_engine.apps.users.models import Users
+from ifrs_metrics_engine.apps.users.models import Users, UserSerializer
 from ifrs_metrics_engine.utils.context_util import get_session_user
 
-
 class UserService:
+
+    def __init__(self ,webhooks_post_events_service : WebhooksPostEventsService  = Provide['webhooks_post_events_service']):
+        self.webhooks_post_events_service = webhooks_post_events_service
 
     def find_user_by_email(self,email):
         pass
@@ -22,6 +27,24 @@ class UserService:
         if not user:
             raise HTTP_400_BAD_REQUEST
         return user.save()
+
+    def create_user_webhook(self ,user_request : dict[Any ,Any]):
+
+        user_data = {
+           'auth_user_id': user_request.get('id'),
+           'username': user_request.get('username'),
+           'email': user_request.get('email'),
+           'display_name': f'{user_request.get("first_name")} {user_request.get("last_name")}',
+        }
+
+        unsafe_metadata = user_request.get('unsafe_metadata')
+
+        serializer = UserSerializer(data=user_data)
+        serializer.is_valid(raise_exception=True)
+        user =  serializer.save()
+
+        if unsafe_metadata:
+            self.webhooks_post_events_service.user_events(unsafe_metadata = unsafe_metadata,user = user)
 
 
     def clerk_create_user(self ,email):
